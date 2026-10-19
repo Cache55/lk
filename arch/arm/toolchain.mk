@@ -129,6 +129,13 @@ ifeq ($(ARM_CPU),cortex-a55-nofp)
 # A55's fpu for anything built without float flags
 ARCH_arm_COMPILEFLAGS += -mcpu=cortex-a55 -mfpu=none -mfloat-abi=soft
 endif
+ifeq ($(ARM_CPU),cortex-a55-nofp-nosimd-softfp)
+# The A55 without its FPU and Advanced SIMD, with the softfp float ABI, on every
+# source. With no FPU, softfp generates the same code as soft (__SOFTFP__ is
+# defined, no FP or SIMD instructions); this spelling matches builds that pass
+# these exact flags.
+ARCH_arm_COMPILEFLAGS += -mcpu=cortex-a55+nofp+nosimd -mfloat-abi=softfp
+endif
 ifeq ($(ARM_CPU),arm1136j-s)
 ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)
 endif
