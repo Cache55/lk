@@ -24,6 +24,9 @@ endif
 # on one will need it passed explicitly instead.
 ifneq ($(IGNORE_LOCAL_MK),1)
 -include local.mk
+
+# TOOLCHAIN=atfe: Arm Toolchain for Embedded, through the clang path
+include make/toolchain-atfe.mk
 endif
 
 # If one of our goals (from the commandline) happens to have a
