@@ -114,6 +114,10 @@ ifeq ($(ARM_CPU),cortex-a15)
 ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)
 ARCH_arm_COMPILEFLAGS_FLOAT += -mfpu=neon -mfloat-abi=softfp
 endif
+ifeq ($(ARM_CPU),cortex-a55)
+ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)
+ARCH_arm_COMPILEFLAGS_FLOAT += -mfpu=neon-fp-armv8 -mfloat-abi=softfp
+endif
 ifeq ($(ARM_CPU),arm1136j-s)
 ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)
 endif

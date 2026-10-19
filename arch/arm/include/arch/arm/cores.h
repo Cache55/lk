@@ -34,7 +34,10 @@
 #if defined(__ARM_ARCH_8R__)
 #define ARM_ARCH_8R 1
 #endif
-#if defined(__ARM_ARCH_8A__) || defined(ARM_ARCH_8R)
+#if defined(__ARM_ARCH_8A__) || defined(__ARM_ARCH_8_1A__) || defined(__ARM_ARCH_8_2A__) || \
+    defined(__ARM_ARCH_8_3A__) || defined(__ARM_ARCH_8_4A__) || defined(__ARM_ARCH_8_5A__) || \
+    defined(__ARM_ARCH_8_6A__) || defined(__ARM_ARCH_8_7A__) || defined(__ARM_ARCH_8_8A__) || \
+    defined(__ARM_ARCH_8_9A__) || defined(ARM_ARCH_8R)
 #define ARM_ARCH_8A 1
 #endif
 #if defined(__ARM_ARCH_8__) || defined(ARM_ARCH_8A) || defined(ARM_ARCH_8M)
