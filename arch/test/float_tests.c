@@ -114,18 +114,23 @@ extern void float_neon_arm_instruction_test(void);
 extern void float_neon_thumb_instruction_test(void);
 
 /* There is nothing to assert here beyond not taking an undefined instruction
- * exception: each routine executes a pile of VFP and NEON encodings with the
- * FPU disabled, so the kernel has to decode and emulate the trap for every one
- * of them. Reaching the end means they all decoded. */
+ * exception: each routine executes a pile of VFP and NEON encodings (NEON only
+ * on cores with Advanced SIMD, ARM_WITH_NEON) with the FPU disabled, so the
+ * kernel has to decode and emulate the trap for every one of them. Reaching
+ * the end means they all decoded. */
 static bool arm_float_instruction_trap_test(void) {
     BEGIN_TEST;
 
 #if !ARM_ONLY_THUMB
     float_vfp_arm_instruction_test();
+#if ARM_WITH_NEON
     float_neon_arm_instruction_test();
 #endif
+#endif
     float_vfp_thumb_instruction_test();
+#if ARM_WITH_NEON
     float_neon_thumb_instruction_test();
+#endif
 
     END_TEST;
 }

@@ -30,6 +30,7 @@
     vldr    s0, [r0]
 .endm
 
+#if ARM_WITH_NEON
 .macro neon_instructions
     disable r12
     vadd.f32 q0, q0, q0
@@ -41,6 +42,7 @@
     disable r12
     vmov    s0, r0
 .endm
+#endif
 
 #if !ARM_ONLY_THUMB
 .arm
@@ -49,9 +51,11 @@ FUNCTION(float_vfp_arm_instruction_test)
     vfp_instructions
     bx  lr
 
+#if ARM_WITH_NEON
 FUNCTION(float_neon_arm_instruction_test)
     neon_instructions
     bx  lr
+#endif
 #endif
 
 .thumb
@@ -60,9 +64,11 @@ FUNCTION(float_vfp_thumb_instruction_test)
     vfp_instructions
     bx  lr
 
+#if ARM_WITH_NEON
 FUNCTION(float_neon_thumb_instruction_test)
     neon_instructions
     bx  lr
+#endif
 
 .data
 LOCAL_DATA(float_test_scratch)
