@@ -5,9 +5,11 @@ GLOBAL_INCLUDES += \
 
 PLATFORM := gem5-vexpress
 
-# 8 x Cortex-A55 in AArch32: Thumb-2 kernel, softfp float ABI.
+# 8 x Cortex-A55 in AArch32, Thumb-2 kernel. ARM_CPU picks the FPU variant:
+# cortex-a55 (FP + SIMD, softfp), cortex-a55-nosimd (FP, softfp),
+# cortex-a55-nofp (soft float).
 ARCH := arm
-ARM_CPU := cortex-a55
+ARM_CPU ?= cortex-a55
 WITH_SMP := 1
 SMP_MAX_CPUS := 8
 ENABLE_THUMB := true

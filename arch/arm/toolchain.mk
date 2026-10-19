@@ -115,8 +115,19 @@ ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)
 ARCH_arm_COMPILEFLAGS_FLOAT += -mfpu=neon -mfloat-abi=softfp
 endif
 ifeq ($(ARM_CPU),cortex-a55)
-ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)
+ARCH_arm_COMPILEFLAGS += -mcpu=cortex-a55
 ARCH_arm_COMPILEFLAGS_FLOAT += -mfpu=neon-fp-armv8 -mfloat-abi=softfp
+endif
+ifeq ($(ARM_CPU),cortex-a55-nosimd)
+# +nosimd, not -mfpu=fp-armv8: with -mcpu=cortex-a55, clang keeps Advanced SIMD
+# enabled for -mfpu=fp-armv8 (__ARM_NEON stays defined).
+ARCH_arm_COMPILEFLAGS += -mcpu=cortex-a55+nosimd
+ARCH_arm_COMPILEFLAGS_FLOAT += -mfloat-abi=softfp
+endif
+ifeq ($(ARM_CPU),cortex-a55-nofp)
+# on every source, not just the float ones: clang would otherwise enable the
+# A55's fpu for anything built without float flags
+ARCH_arm_COMPILEFLAGS += -mcpu=cortex-a55 -mfpu=none -mfloat-abi=soft
 endif
 ifeq ($(ARM_CPU),arm1136j-s)
 ARCH_arm_COMPILEFLAGS += -mcpu=$(ARM_CPU)

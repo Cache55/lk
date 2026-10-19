@@ -172,23 +172,33 @@ GLOBAL_DEFINES += WITH_NO_FP=1
 endif
 HANDLED_CORE := true
 endif
-ifeq ($(ARM_CPU),cortex-a55)
+ifneq ($(filter cortex-a55 cortex-a55-nosimd cortex-a55-nofp,$(ARM_CPU)),)
 # Cortex-A55 in AArch32 state. The A32/T32 kernel code is shared with the
 # v7-A cores; ARM_ISA_ARMv8 adds the v8 only paths (e.g. ldaex/stlex).
+#   cortex-a55         FP and Advanced SIMD (NEON), softfp
+#   cortex-a55-nosimd  FP without Advanced SIMD, softfp
+#   cortex-a55-nofp    no FP or SIMD at all, soft float
 GLOBAL_DEFINES += \
+	ARM_CPU_CORTEX_A55=1 \
 	ARM_WITH_CP15=1 \
 	ARCH_HAS_MMU=1 \
 	ARM_ISA_ARMv7=1 \
 	ARM_ISA_ARMv7A=1 \
 	ARM_ISA_ARMv8=1 \
 	ARM_ISA_ARMv8A=1 \
-	ARM_WITH_VFP=1 \
-	ARM_WITH_NEON=1 \
 	ARM_WITH_THUMB=1 \
 	ARM_WITH_THUMB2=1 \
 	ARM_WITH_CACHE=1 \
 	ARM_WITH_L2=1 \
 	ARM_WITH_HYP=1
+ifeq ($(ARM_CPU),cortex-a55-nofp)
+GLOBAL_DEFINES += WITH_NO_FP=1
+else
+GLOBAL_DEFINES += ARM_WITH_VFP=1
+ifeq ($(ARM_CPU),cortex-a55)
+GLOBAL_DEFINES += ARM_WITH_NEON=1
+endif
+endif
 HANDLED_CORE := true
 endif
 ifeq ($(ARM_CPU),cortex-a8)
