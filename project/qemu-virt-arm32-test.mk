@@ -7,3 +7,6 @@ include project/virtual/fs.mk
 include project/virtual/minip.mk
 include project/target/qemu-virt-arm32.mk
 
+
+# ARM <-> Thumb interworking tests
+MODULES += app/interwork_tests

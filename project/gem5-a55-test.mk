@@ -3,3 +3,6 @@
 TARGET := gem5-a55
 
 include project/virtual/test.mk
+
+# ARM <-> Thumb interworking tests
+MODULES += app/interwork_tests
