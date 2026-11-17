@@ -143,6 +143,22 @@ void arm64_secondary_entry(ulong asm_cpu_num) {
 }
 #endif // WITH_SMP
 
+#if WITH_SMP && defined(ARM64_SECONDARIES_SPIN_AT_RESET) && ARM64_SECONDARIES_SPIN_AT_RESET
+extern volatile uint64_t arm64_secondary_release;
+extern char _start[], _end[];
+
+void arm64_release_secondaries_from_reset(void) {
+    // The waiting secondaries read memory with the mmu and caches off, so the
+    // kernel image (mmu setup state, stacks) must be in memory, not just in
+    // this cpu's cache, before they go. Then publish the flag the same way.
+    arch_clean_cache_range((addr_t)_start, (size_t)(_end - _start));
+    arm64_secondary_release = 1;
+    arch_clean_cache_range((addr_t)&arm64_secondary_release, sizeof(arm64_secondary_release));
+    __asm__ volatile("dsb sy\n"
+                     "sev" ::: "memory");
+}
+#endif
+
 uint64_t arm64_cpu_num_to_mpidr(uint cpu_num) {
 #if WITH_SMP
     if (cpu_num == 0) {

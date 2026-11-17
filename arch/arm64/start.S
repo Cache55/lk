@@ -54,6 +54,29 @@ FUNCTION(arm64_reset)
     // Just a quick solution to make it easy to compute the starting address.
     b       arm64_secondary_phys_entry
 .Larm_reset_primary:
+#if defined(ARM64_SECONDARIES_SPIN_AT_RESET) && ARM64_SECONDARIES_SPIN_AT_RESET
+    /*
+     * For platforms that reset every cpu at the kernel entry instead of
+     * starting the secondaries through PSCI (gem5 bare metal). The cpu with
+     * MPIDR Aff0 == 0 boots; the others wait here, mmu and caches off, until
+     * arm64_release_secondaries_from_reset() sets arm64_secondary_release,
+     * then enter as secondary cpu number Aff0.
+     */
+    mrs     tmp, mpidr_el1
+    and     tmp, tmp, #0xff
+    cbz     tmp, .Larm_reset_boot_cpu
+    adrp    tmp2, arm64_secondary_release   /* pc relative: physical address */
+    add     tmp2, tmp2, #:lo12:arm64_secondary_release
+.Larm_reset_secondary_wait:
+    ldr     x0, [tmp2]
+    cbnz    x0, .Larm_reset_secondary_go
+    wfe
+    b       .Larm_reset_secondary_wait
+.Larm_reset_secondary_go:
+    mov     x0, tmp
+    b       arm64_secondary_phys_entry
+.Larm_reset_boot_cpu:
+#endif
 #endif
 
     /* keep track of the boot EL */
@@ -537,6 +560,12 @@ END_DATA(arm64_boot_args)
 DATA(arm64_boot_el)
     .skip 8
 END_DATA(arm64_boot_el)
+#if WITH_SMP && defined(ARM64_SECONDARIES_SPIN_AT_RESET) && ARM64_SECONDARIES_SPIN_AT_RESET
+/* set to 1 to release the secondaries waiting in arm64_reset */
+DATA(arm64_secondary_release)
+    .quad 0
+END_DATA(arm64_secondary_release)
+#endif
 
 .section .bss.prebss.stack
     .align 4

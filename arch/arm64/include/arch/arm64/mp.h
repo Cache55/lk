@@ -22,6 +22,11 @@ void arm64_mp_init(void);
 // will cause it to allocate percpu structures for them.
 void arm64_set_secondary_cpu_count(int count);
 
+// Platforms that reset every cpu at the kernel entry (ARM64_SECONDARIES_SPIN_AT_RESET):
+// let the secondaries waiting in arm64_reset continue. Call after
+// arm64_set_secondary_cpu_count() and lk_init_secondary_cpus().
+void arm64_release_secondaries_from_reset(void);
+
 struct arm64_percpu {
     uint cpu_num;
     uint64_t mpidr;
