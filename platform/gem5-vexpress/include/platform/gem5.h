@@ -19,14 +19,18 @@
  * Generic timer PPIs: 27 virtual EL1, 30 physical EL1, 29 physical EL3.
  */
 
-/* memory: phys == virt, so no trampoline is needed when the mmu comes on */
+/* memory: phys == virt on AArch32; mapped at KERNEL_BASE on AArch64 */
 #define MEMORY_BASE_PHYS     (MEMBASE)
 #define MEMORY_APERTURE_SIZE (MEMSIZE)
 
 /* the motherboard and on chip peripherals, 0x1C00_0000 - 0x2FFF_FFFF */
 #define PERIPHERAL_BASE_PHYS (0x1C000000UL)
 #define PERIPHERAL_BASE_SIZE (0x14000000UL)
+#if __aarch64__
+#define PERIPHERAL_BASE_VIRT (0xffffffffc0000000UL)
+#else
 #define PERIPHERAL_BASE_VIRT (0xE0000000UL)
+#endif
 #define PERIPHERAL_VIRT(pa)  (PERIPHERAL_BASE_VIRT + ((pa) - PERIPHERAL_BASE_PHYS))
 
 #define UART0_BASE_PHYS      (0x1C090000UL)
@@ -42,6 +46,7 @@
 #define GICD_SIZE            (0x10000UL)
 #define GICC_BASE_PHYS       (0x2C002000UL)
 #define GICC_SIZE            (0x2000UL)
+#define GICD_TYPER_OFFSET    (0x4)
 
 #define ARM_GENERIC_TIMER_VIRTUAL_INT  (27)
 #define ARM_GENERIC_TIMER_PHYSICAL_INT (30)

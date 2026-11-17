@@ -20,6 +20,14 @@
 #define M5OP_DUMP_STATS  0x41
 
 .text
+#if __aarch64__
+/* AArch64 encoding: util/m5/src/abi/arm64/m5op.S, arguments in x0, x1 */
+.macro m5op name, func
+FUNCTION(\name)
+    .long 0xff000110 | (\func << 16)
+    ret
+.endm
+#else
 .arm
 
 .macro m5op name, func
@@ -27,6 +35,7 @@ FUNCTION(\name)
     .long 0xEE000110 | (\func << 16)
     bx      lr
 .endm
+#endif
 
 m5op m5_exit, M5OP_EXIT
 m5op m5_fail, M5OP_FAIL

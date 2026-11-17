@@ -17,6 +17,11 @@
 #include <dev/uart/pl011.h>
 #include <kernel/vm.h>
 #include <platform.h>
+#include <lk/reg.h>
+#if __aarch64__ && WITH_SMP
+#include <arch/arm64/mp.h>
+#include <lk/main.h>
+#endif
 
 #define LOCAL_TRACE 0
 
@@ -84,11 +89,27 @@ LK_INIT_HOOK(platform_postvm_init, platform_postvm_init, LK_INIT_LEVEL_VM);
 void platform_init(void) {
     pl011_init(0);
 
+#if __aarch64__ && WITH_SMP
+    /*
+     * Every cpu starts at the kernel entry under gem5 (no boot loader). The
+     * secondaries wait in arch/arm64/start.S. gem5 gives each core a GIC cpu
+     * interface, so GICD_TYPER.CPUNumber is the number of simulated cores.
+     */
+    uint32_t typer = *REG32(PERIPHERAL_VIRT(GICD_BASE_PHYS) + GICD_TYPER_OFFSET);
+    uint cpus = ((typer >> 5) & 0x7) + 1;
+    if (cpus > SMP_MAX_CPUS)
+        cpus = SMP_MAX_CPUS;
+    dprintf(INFO, "gem5: %u cpus present, %d configured\n", cpus, SMP_MAX_CPUS);
+    arm64_set_secondary_cpu_count(cpus - 1);
+    lk_init_secondary_cpus(cpus - 1);
+    arm64_release_secondaries_from_reset();
+#else
     /*
      * Every cpu starts at the kernel entry under gem5 (no boot loader). The
      * secondaries park in start.S until arch_init releases arm_boot_cpu_lock.
      */
     dprintf(INFO, "gem5: %d cpus configured\n", SMP_MAX_CPUS);
+#endif
 }
 
 static void gem5_shutdown(void) {
